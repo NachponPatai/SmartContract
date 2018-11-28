@@ -17,7 +17,10 @@ class App extends Component {
         { id: 3, name: 'Cssss', price: 30 },
         { id: 4, name: 'Dssss', price: 4 },
         { id: 5, name: 'Essss', price: .5 },
-        { id: 6, name: 'Antivist', price: 1200.5},
+        { id: 6, name: 'Antivist', price: 1200.5 },
+        { id: 7, name: 'Blasphemy', price: 656.5 },
+        { id: 8, name: 'Can You Feel My Heart', price: 454.5 },
+        { id: 9, name: 'Avalanche', price: 0.88 },
       ],
       value: '',
       term: ''
@@ -47,28 +50,31 @@ class App extends Component {
     let games = this.state.gamelib;
     console.log(games);
     return (
-      <div>
-        <h2>gameshop</h2>
-        <p>This Contract is owner by {this.state.owner}</p>
-        {/* <p>Get Game library {this.state.gamelib}</p> */}
-        <hr />
-        <form>
-          <h4>
-            Buy Game
-          </h4>
-          <div>
-            <label>Price</label>
-            <input
-              value={this.state.value}
-              onChange={event => this.setState({ value: event.target.value })}
-            />
-          </div>
-          <button>Buy</button>
-        </form>
-
+      <div className="App">
         <div>
-          <h1>Digital Store</h1>
+          <h2>Welcome {this.state.owner} to Game-shop</h2>
+          <p>This Contract is owner by {this.state.owner}</p>
+          {/* <p>Get Game library {this.state.gamelib}</p> */}
+          <hr />
+          <form>
+            <h4>
+              Buy Game
+          </h4>
+            <div>
+              <label>Price</label>
+              <input
+                value={this.state.value}
+                onChange={event => this.setState({ value: event.target.value })}
+              />
+            </div>
+            <button>Buy</button>
+          </form>
+        </div>
+        <hr />
+        <div>
+          <h1>Games Library</h1>
           <SearchBar handleSearch={this.handleSearch} />
+          <hr />
           <GamesLibrary
             gamesList={games}
             searchTerm={this.state.term}
@@ -92,14 +98,14 @@ class Game extends Component {
     return (
       <div className='Game'>
         <Card>
-            <CardImg top width="360" src={logo} />
-            <CardBody>
-              <CardTitle>{this.props.id} {this.props.name}</CardTitle>
-              <CardSubtitle>{this.props.price}</CardSubtitle>
-              <CardText>Some quick example text to build.</CardText>
-              <Button>Button</Button>
-            </CardBody>
-          </Card>
+          <CardImg top width="100%" height="384px" src={logo} />
+          <CardBody>
+            <CardTitle>{this.props.id} {this.props.name}</CardTitle>
+            <CardSubtitle>{this.props.price}</CardSubtitle>
+            <CardText>Some quick example text to build.</CardText>
+            <Button className="BuyButton">Buy</Button>
+          </CardBody>
+        </Card>
       </div>
     )
   }
