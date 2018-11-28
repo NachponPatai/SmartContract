@@ -3,9 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ganache-cli": "^6.2.3",
+    "mocha": "^5.2.0",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
     "react-scripts": "2.1.1",
+    "reactstrap": "^6.5.0",
+    "truffle-hdwallet-provider": "0.0.3",
     "web3": "^1.0.0-beta.35"
   },
   "scripts": {
