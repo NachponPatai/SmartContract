@@ -4,12 +4,13 @@ import web3 from './web3';
 import gameshop from './gameshop';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
 import logo from './logo.svg';
-
+import { login, signup } from './Connect';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
+      userID: null,
       owner: '',
       gamelib: [
         { id: 1, name: 'Assss', price: 1000 },
@@ -35,6 +36,14 @@ class App extends Component {
     });
   }
 
+  login(address, password) {
+    login(address, password).then(res => {
+      var state = this.state;
+      state.userID = address;
+      this.setState(state);
+    })
+  }
+
   async componentDidMount() {
     // const owner = await gameshop.methods.owner().call();
     // const gamelib = await gameshop.methods.getGame().call();
@@ -51,6 +60,10 @@ class App extends Component {
     console.log(games);
     return (
       <div className="App">
+        <Login onLoginClicked={(address, password) => {
+          this.login(address, password)
+          }
+        } />
         <div>
           <h2>Welcome {this.state.owner} to Game-shop</h2>
           <p>This Contract is owner by {this.state.owner}</p>
@@ -171,5 +184,311 @@ class SearchBar extends Component {
     )
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class Login extends Component {
+  constructor() {
+    super();
+
+    this.state = {
+      userAddress: null,
+      password: null
+    }
+  }
+
+    render() {
+      return (
+        <div className="Login">
+          <input className="UserAddress" type="text" placeholder="Your account address..." onChange={e => this.setState({
+            userAddress: e.target.value,
+              })
+            } />
+          <input className="Password" type="text" placeholder="Password..." onChange={e => this.setState({
+            password: e.target.value,
+              })
+            } />
+          {/* <h1>account: {this.state.userAddress}</h1> */}
+          {/* <h1>password: {this.state.password}</h1> */}
+          <button onClick={() => this.props.onLoginClicked(this.state.userAddress, this.state.password)}>
+          Login
+          </button>
+        </div>
+      )
+    }
+  }
 
 export default App;
