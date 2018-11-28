@@ -4,7 +4,7 @@ pragma experimental ABIEncoderV2;
  
 contract Inbox{
    
-    address owner;
+    address public owner;
     mapping (address=>bool[]) gamelib;
    
     struct Game{
