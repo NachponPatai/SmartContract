@@ -1,5 +1,7 @@
-import abi from './abi'
+// import abi from './abi';
+import gameShop from './gameshop';
 const web3 = require('web3');
+const contract = gameShop;
 
 export const login = (address, password) => {
     return new Promise((resolve) => {
@@ -15,10 +17,9 @@ export const signup = (password) => {
 
 export const buyGame = (address, selectedGame) => {
     return new Promise((resolve) => {
-        var CoursetroContract = new web3.eth.Contract(abi, address);
-        console.log(CoursetroContract.abi)
-        CoursetroContract.methods.buyGame(selectedGame).send({value: 0.1, from: address})
-        resolve("resolve")
+        console.log(contract.methods.buyGame(selectedGame));
+        // console.log(contract.methods.buyGame(selectedGame).send({value: 0.1, from: address}));
+        resolve(selectedGame)
     });
 }  
 

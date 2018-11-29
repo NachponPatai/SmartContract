@@ -4,7 +4,8 @@ import web3 from './web3';
 import gameshop from './gameshop';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
 import logo from './logo.svg';
-import { login, getGame , buyGame } from './Connect';
+import { login, getGame, buyGame } from './Connect';
+import { stat } from 'fs';
 
 class App extends Component {
   constructor() {
@@ -18,9 +19,9 @@ class App extends Component {
         { id: 3, name: 'Cssss', price: 30 },
         { id: 4, name: 'Dssss', price: 4 },
         { id: 5, name: 'Essss', price: .5 },
-        { id: 6, name: 'Antivist', price: 1200.5 },
-        { id: 7, name: 'Blasphemy', price: 656.5 },
-        { id: 8, name: 'Can You Feel My Heart', price: 454.5 },
+        { id: 6, name: 'kuy', price: 1200.5 },
+        { id: 7, name: 'bar', price: 656.5 },
+        { id: 8, name: 'foo', price: 454.5 },
         { id: 9, name: 'Avalanche', price: 0.88 },
       ],
       value: '',
@@ -36,20 +37,13 @@ class App extends Component {
     });
   }
 
-  getgame(address,contractInstance) {
-    getGame(address,contractInstance).then(res => {
+  getgame(address, contractInstance) {
+    getGame(address, contractInstance).then(res => {
       var state = this.state;
-      state.gamelib = res;
+      state.gamelib = res.gamelib;
+      console.log(state.gamelib);
       this.setState(state);
-    })
-  }
-
-  buygame(address, selectedGame) {
-    buyGame(address, selectedGame).then(res => {
-      var state = this.state;
-      state.gamelib = res;
-      this.setState(state);
-    })
+    });
   }
 
   login(address, password) {
@@ -62,7 +56,7 @@ class App extends Component {
 
   async componentDidMount() {
     const owner = await gameshop.methods.owner().call();
-    // const gamelib = await gameshop.methods.getGame().call();
+    const gamelib = await gameshop.methods.getGame().call();
     // console.log('+++', gamelib);
     this.setState(
       {
@@ -72,7 +66,6 @@ class App extends Component {
 
   render() {
     let games = this.state.gamelib;
-
     // console.log(games);
     return (
       <div className="App">
@@ -81,17 +74,8 @@ class App extends Component {
           console.log(this.state.gamelib)
           // console.log(this.state.userID)
           }
-          
         } />
-        <Login 
-          contractInstance={this.props.contractInstance}
-          onLoginClicked={(address) => {
-          this.buygame(address,2)
-          console.log(this.state.gamelib)
-          // console.log(this.state.userID)
-          }
-          
-        } />
+
         <div>
           <h2>Welcome {this.state.userID} to Game-shop</h2>
           <p>This Contract is owner by {this.state.owner}</p>
@@ -117,8 +101,10 @@ class App extends Component {
           <SearchBar handleSearch={this.handleSearch} />
           <hr />
           <GamesLibrary
+            contractInstance={this.props.contractInstance}
             gamesList={games}
             searchTerm={this.state.term}
+            userAddress={this.state.userID}
           />
         </div>
 
@@ -131,11 +117,24 @@ class Game extends Component {
   constructor() {
     super();
     this.state = {
+      gamelib: [],
       selectedGame: {},
     }
   }
 
+  buygame(address, selectedGame) {
+    buyGame(address, selectedGame).then(res => {
+      var state = this.state;
+      console.log(this.props.gamesList)
+      state.selectedGame = this.props.gamesList[this.props.id];
+      console.log(res)
+      console.log('buyGanme', state.gamelib)
+    })
+  }
+
   render() {
+    let gameID = this.props.id;
+    console.log(gameID)
     return (
       <div className='Game'>
         <Card>
@@ -144,7 +143,13 @@ class Game extends Component {
             <CardTitle>{this.props.id} {this.props.name}</CardTitle>
             <CardSubtitle>{this.props.price}</CardSubtitle>
             <CardText>Some quick example text to build.</CardText>
-            <Button className="BuyButton">Buy</Button>
+            <BuyGame
+              gameID={gameID}
+              contractInstance={this.props.contractInstance}
+              onBuyClicked={(address, selectedGameIndex) => {
+                              this.buygame(address, selectedGameIndex)
+                            }
+              } />
           </CardBody>
         </Card>
       </div>
@@ -158,16 +163,17 @@ class GamesLibrary extends Component {
   }
 
   render() {
+    console.log(this.props.contractInstance);
     let term = this.props.searchTerm;
     let temp;
-
+    console.log(this.props.gamesList)
     function searchFor(term) {
       return function (temp) {
         try {
           return temp.name.toLowerCase().includes(term.toLowerCase()) || !term;
         }
         catch (err) {
-
+          return 'Nothing found...'
         }
       }
     }
@@ -175,9 +181,12 @@ class GamesLibrary extends Component {
     let gamesData = this.props.gamesList.filter(searchFor(term)).map(game => {
       return (
         <Game
+          gamesList={this.props.gamesList}
+          contractInstance={this.props.contractInstance}
           id={game.id}
           name={game.name}
           price={game.price}
+          userAddress={this.props.userAddress}
         />
       )
     });
@@ -498,25 +507,47 @@ class Login extends Component {
     }
   }
 
-    render() {
-      return (
-        <div className="Login">
-          <input className="UserAddress" type="text" placeholder="Your account address..." onChange={e => this.setState({
-            userAddress: e.target.value,
-              })
-            } />
-          <input className="Password" type="text" placeholder="Password..." onChange={e => this.setState({
-            password: e.target.value,
-              })
-            } />
-          {/* <h1>account: {this.state.userAddress}</h1> */}
-          {/* <h1>password: {this.state.password}</h1> */}
-          <button onClick={() => this.props.onLoginClicked(this.state.userAddress, this.state.password)}>
-          Login
-          </button>
-        </div>
-      )
+  render() {
+    return (
+      <div className="Login">
+        <input className="UserAddress" type="text" placeholder="Your account address..." onChange={e => this.setState({
+          userAddress: e.target.value,
+        })
+        } />
+        <input className="Password" type="text" placeholder="Password..." onChange={e => this.setState({
+          password: e.target.value,
+        })
+        } />
+        {/* <h1>account: {this.state.userAddress}</h1> */}
+        {/* <h1>password: {this.state.password}</h1> */}
+        <button onClick={() => this.props.onLoginClicked(this.state.userAddress, this.state.password)}>
+        Login
+        </button>
+      </div>
+    )
+  }
+}
+
+class BuyGame extends Component {
+  constructor() {
+    super();
+
+    this.state = {
     }
   }
+
+  render() {
+    let selectedGameIndex = this.props.gameID;
+    console.log('BuyGame', selectedGameIndex)
+    let userAddress = this.props.userAddress;
+    return (
+      <div className="BuyGame">
+        <button onClick={() => this.props.onBuyClicked(userAddress, selectedGameIndex)}>
+        Buy
+        </button>
+      </div>
+    )
+  }
+}
 
 export default App;
