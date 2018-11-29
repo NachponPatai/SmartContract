@@ -2,6 +2,20 @@
 const HDWalletProvider = require('truffle-hdwallet-provider');
 const Web3 = require('web3');
 const {interface, bytecode} = require('./compile');
+const path = require('path');
+const fs = require('fs');
+const solc = require('solc');
+const express = require('express');
+const ganache = require('ganache-cli');
+
+
+var app = express();
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use((req, res, next) => {
+    res.append('Access-Control-Allow-Origin', '*');
+    next();
+});
 
 
 //set provider to new instance with two arguments, account pneumonic and network URL
@@ -28,5 +42,16 @@ const deploy = async () =>{
     console.log(interface)
     console.log('Contract deployed to ', result.options.address);
 };
+
+app.post('/login', (req, res) => {
+    web3.eth.getAccounts()
+        .then(accounts => {
+            if (accounts.includes(req.body.address)) {
+                res.sendStatus(200)
+            } else {
+                res.sendStatus(403)
+            }
+        }).catch(err => res.sendStatus(403))
+})
 
 deploy();

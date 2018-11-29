@@ -4,7 +4,7 @@ import web3 from './web3';
 import gameshop from './gameshop';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
 import logo from './logo.svg';
-import { login, signup } from './Connect';
+import { login, getGame , buyGame } from './Connect';
 
 class App extends Component {
   constructor() {
@@ -36,6 +36,22 @@ class App extends Component {
     });
   }
 
+  getgame(address,contractInstance) {
+    getGame(address,contractInstance).then(res => {
+      var state = this.state;
+      state.gamelib = res;
+      this.setState(state);
+    })
+  }
+
+  buygame(address, selectedGame) {
+    buyGame(address, selectedGame).then(res => {
+      var state = this.state;
+      state.gamelib = res;
+      this.setState(state);
+    })
+  }
+
   login(address, password) {
     login(address, password).then(res => {
       var state = this.state;
@@ -45,27 +61,39 @@ class App extends Component {
   }
 
   async componentDidMount() {
-    // const owner = await gameshop.methods.owner().call();
+    const owner = await gameshop.methods.owner().call();
     // const gamelib = await gameshop.methods.getGame().call();
     // console.log('+++', gamelib);
-    // this.setState(
-    //   {
-    //     owner,
-    //     gamelib
-    //   });
+    this.setState(
+      {
+        owner
+      });
   }
 
   render() {
     let games = this.state.gamelib;
-    console.log(games);
+
+    // console.log(games);
     return (
       <div className="App">
         <Login onLoginClicked={(address, password) => {
           this.login(address, password)
+          console.log(this.state.gamelib)
+          // console.log(this.state.userID)
           }
+          
+        } />
+        <Login 
+          contractInstance={this.props.contractInstance}
+          onLoginClicked={(address) => {
+          this.buygame(address,2)
+          console.log(this.state.gamelib)
+          // console.log(this.state.userID)
+          }
+          
         } />
         <div>
-          <h2>Welcome {this.state.owner} to Game-shop</h2>
+          <h2>Welcome {this.state.userID} to Game-shop</h2>
           <p>This Contract is owner by {this.state.owner}</p>
           {/* <p>Get Game library {this.state.gamelib}</p> */}
           <hr />

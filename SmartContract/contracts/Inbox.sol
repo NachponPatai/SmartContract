@@ -56,7 +56,7 @@ contract Inbox{
         }
     }
    
-    function getGame() public view returns (string[]) {
+    function getGame() public view returns (string[] memory) {
         string[] memory lib = new string[](10);
         for (uint i = 0; i < gamelib[msg.sender].length; i++) {
             if (gamelib[msg.sender][i]) {

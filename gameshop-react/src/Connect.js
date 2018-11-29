@@ -1,33 +1,33 @@
-import $ from 'jquery';
-
-const url = "http://localhost:8080";
+import abi from './abi'
+const web3 = require('web3');
 
 export const login = (address, password) => {
     return new Promise((resolve) => {
-        $.post(url + "/login", {address, password}, (res, status) => {
-            if (status === "success") {
-                resolve(res);
-            }
-        });
+        resolve("success")
     });
 }
 
 export const signup = (password) => {
     return new Promise((resolve) => {
-        $.post(url + "/signup", {password}, (res, status) => {
-            if (status === "success") {
-                resolve(res);
-            }
-        });
+        resolve("success")
     });
 }
 
 export const buyGame = (address, selectedGame) => {
     return new Promise((resolve) => {
-        $.post(url + "/purchase", {address, selectedGame}, (res, status) => {
-            if (status === "success") {
-                resolve(res);
-            }
-        });
+        var CoursetroContract = new web3.eth.Contract(abi, address);
+        console.log(CoursetroContract.abi)
+        CoursetroContract.methods.buyGame(selectedGame).send({value: 0.1, from: address})
+        resolve("resolve")
     });
-}
+}  
+
+export const getGame = (address,CoursetroContract) => {
+    return new Promise((resolve) => {
+        CoursetroContract.methods.getGame().call().then(result => {
+            var libr = []
+            libr.push({lib: result})
+            resolve(libr)
+        })
+    });
+}   
