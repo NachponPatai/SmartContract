@@ -15,14 +15,13 @@ export const signup = (password) => {
     });
 }
 
-export const buyGame = (address, selectedGame) => {
+export const buyGame = (address, selectedGameIndex, price) => {
     return new Promise((resolve) => {
-        console.log(address);
-        console.log(selectedGame);
-        console.log(contract.methods.buyGame(selectedGame));
-        contract.methods.buyGame(selectedGame).send({value: 100000000, from: address});
+        console.log(selectedGameIndex);
+        console.log('------', price);
+        contract.methods.buyGame(selectedGameIndex).send({value: price, from: address});
         // console.log();
-        resolve(selectedGame)
+        resolve(selectedGameIndex)
     });
 }  
 

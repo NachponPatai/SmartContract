@@ -11,21 +11,22 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      userAddress: null,
+      userAddress: '',
       owner: '',
       gamelib: [
-        { id: 1, name: 'Assss', price: 1000 },
-        { id: 2, name: 'Bssss', price: 200 },
-        { id: 3, name: 'Cssss', price: 30 },
-        { id: 4, name: 'Dssss', price: 4 },
-        { id: 5, name: 'Essss', price: .5 },
-        { id: 6, name: 'kuy', price: 1200.5 },
-        { id: 7, name: 'bar', price: 656.5 },
-        { id: 8, name: 'foo', price: 454.5 },
-        { id: 9, name: 'Avalanche', price: 0.88 },
+        { id: 1, name: 'Assss', price: 100000000000000000 },
+        { id: 2, name: 'Bssss', price: 200000000000000000 },
+        { id: 3, name: 'Cssss', price: 300000000000000000 },
+        { id: 4, name: 'Dssss', price: 400000000000000000 },
+        { id: 5, name: 'Essss', price: 500000000000000000 },
+        { id: 6, name: 'kuy', price: 120005000000000000 },
+        { id: 7, name: 'bar', price: 656500000000000000 },
+        { id: 8, name: 'foo', price: 454500000000000000 },
+        { id: 9, name: 'Avalanche', price: 88888888888888888 },
       ],
       value: '',
-      term: ''
+      term: '',
+      isLoggedIn: false
     };
 
     this.handleSearch = this.handleSearch.bind(this);
@@ -50,6 +51,14 @@ class App extends Component {
     login(address, password).then(res => {
       var state = this.state;
       state.userAddress = address;
+      // if(address === '') {
+      //   state.isLoggedIn = true;
+      //   this.setState(state);
+      // }
+      // else {
+      //   state.isLoggedIn = false;
+      //   this.setState(state);
+      // }
       this.setState(state);
     })
   }
@@ -57,22 +66,23 @@ class App extends Component {
   async componentDidMount() {
     const owner = await gameshop.methods.owner().call();
     const gamelib = await gameshop.methods.getGame().call();
-    // console.log('+++', gamelib);
+    console.log('+++', owner);
     this.setState(
       {
-        owner
+        owner,
       });
   }
 
   render() {
     let games = this.state.gamelib;
-    // console.log(games);
+    console.log(this.state.owner);
+    // console.log('loggedIn', this.state.isLoggedIn);
     return (
       <div className="App">
         <Login onLoginClicked={(address, password) => {
           this.login(address, password)
-          console.log(this.state.gamelib)
-          console.log(this.state.userAddress)
+          // console.log(this.state.gamelib)
+          // console.log(this.state.userAddress)
           }
         } />
 
@@ -81,7 +91,7 @@ class App extends Component {
           <p>This Contract is owner by {this.state.owner}</p>
           {/* <p>Get Game library {this.state.gamelib}</p> */}
           <hr />
-          <form>
+          {/* <form>
             <h4>
               Buy Game
           </h4>
@@ -93,9 +103,8 @@ class App extends Component {
               />
             </div>
             <button>Buy</button>
-          </form>
+          </form> */}
         </div>
-        <hr />
         <div>
           <h1>Games Library</h1>
           <SearchBar handleSearch={this.handleSearch} />
@@ -103,6 +112,7 @@ class App extends Component {
           <GamesLibrary
             contractInstance={this.props.contractInstance}
             gamesList={games}
+            isLoggedIn={this.state.isLoggedIn}
             searchTerm={this.state.term}
             userAddress={this.state.userAddress}
           />
@@ -122,23 +132,23 @@ class Game extends Component {
     }
   }
 
-  buygame(address, selectedGame) {
-    buyGame(address, selectedGame).then(res => {
+  buygame(address, selectedGame, price) {
+    buyGame(address, selectedGame, price).then(res => {
       var gameID = this.props.id;
-      console.log('+++++', address)
-      // console.log(typeof(gameID));
       var state = this.state;
-      state.selectedGame = this.props.gamesList[gameID];
-      // console.log(res)
-      // console.log('buyGanme', this.state.selectedGame)
+      state.selectedGame = this.props.gamesList[gameID - 1];
+      console.log(res);
+      console.log('+++++', address);
+      console.log('buyGanme', this.state.selectedGame);
     })
   }
 
   render() {
     let gameID = this.props.id;
+    let gamePrice = this.props.price;
     let userAddress = this.props.userAddress;
-    // console.log(gameID)
-    console.log(userAddress)
+    // console.log(gameID);
+    console.log(userAddress);
     return (
       <div className='Game'>
         <Card>
@@ -150,9 +160,11 @@ class Game extends Component {
             <BuyGame
               contractInstance={this.props.contractInstance}
               gameID={gameID}
+              gamePrice={gamePrice}
+              isLoggedIn={this.props.isLoggedIn}
               userAddress={userAddress}
-              onBuyClicked={(address, selectedGameIndex) => {
-                              this.buygame(address, selectedGameIndex)
+              onBuyClicked={(address, selectedGameIndex, price) => {
+                              this.buygame(address, selectedGameIndex, price)
                             }
               } />
           </CardBody>
@@ -548,11 +560,13 @@ class BuyGame extends Component {
 
   render() {
     let selectedGameIndex = this.props.gameID;
-    console.log('BuyGame', selectedGameIndex)
+    let selectedGamePrice = this.props.gamePrice;
+    console.log('BuyGame', selectedGameIndex - 1);
+    console.log('gamePrice', selectedGamePrice);
     let userAddress = this.props.userAddress;
     return (
       <div className="BuyGame">
-        <button onClick={() => this.props.onBuyClicked(userAddress, selectedGameIndex)}>
+        <button onClick={() => this.props.onBuyClicked(userAddress, selectedGameIndex - 1, selectedGamePrice)}>
         Buy
         </button>
       </div>
