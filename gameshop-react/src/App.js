@@ -4,25 +4,26 @@ import web3 from './web3';
 import gameshop from './gameshop';
 import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
 import logo from './logo.svg';
-import { login, getGame, buyGame } from './Connect';
+import { login, getGame, buyGame, GiveGame } from './Connect';
 import { stat } from 'fs';
+
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      userAddress: '',
+      userAddress: '0x076fF45138f97A9989a44A84472f59B6661d4dF2',
       owner: '',
       gamelib: [
-        { id: 1, name: 'Assss', price: 100000000000000000 },
-        { id: 2, name: 'Bssss', price: 200000000000000000 },
-        { id: 3, name: 'Cssss', price: 300000000000000000 },
-        { id: 4, name: 'Dssss', price: 400000000000000000 },
-        { id: 5, name: 'Essss', price: 500000000000000000 },
-        { id: 6, name: 'kuy', price: 120005000000000000 },
-        { id: 7, name: 'bar', price: 656500000000000000 },
-        { id: 8, name: 'foo', price: 454500000000000000 },
-        { id: 9, name: 'Avalanche', price: 88888888888888888 },
+        { id: 1, name: 'Assss', price: 554500000000000000 },
+        { id: 2, name: 'Bssss', price: 554500000000000000 },
+        { id: 3, name: 'Cssss', price: 554500000000000000 },
+        { id: 4, name: 'Dssss', price: 554500000000000000 },
+        { id: 5, name: 'Essss', price: 554500000000000000 },
+        { id: 6, name: 'kuy', price: 554500000000000000 },
+        { id: 7, name: 'bar', price: 554500000000000000 },
+        { id: 8, name: 'foo', price: 554500000000000000 },
+        { id: 9, name: 'Avalanche', price: 554500000000000000 },
       ],
       value: '',
       term: '',
@@ -40,10 +41,12 @@ class App extends Component {
 
   getgame(address, contractInstance) {
     getGame(address, contractInstance).then(res => {
+      console.log("RES : ",res);
       var state = this.state;
       state.gamelib = res.gamelib;
-      console.log(state.gamelib);
+      
       this.setState(state);
+      console.log(state.gamelib);
     });
   }
 
@@ -75,7 +78,8 @@ class App extends Component {
 
   render() {
     let games = this.state.gamelib;
-    console.log(this.state.owner);
+    let userAddress = this.state.userAddress;
+    console.log("in main app" ,userAddress);
     // console.log('loggedIn', this.state.isLoggedIn);
     return (
       <div className="App">
@@ -104,6 +108,18 @@ class App extends Component {
             </div>
             <button>Buy</button>
           </form> */}
+        </div>
+        <div>
+        <h1>User Game</h1>
+        <Getgame
+          userAddress={userAddress}
+          
+          onGetgameClicked={(address) =>{
+            console.log("see add",address)
+            this.getgame(address, "password")
+          }
+          
+        }/>
         </div>
         <div>
           <h1>Games Library</h1>
@@ -198,7 +214,7 @@ class GamesLibrary extends Component {
         }
       }
     }
-
+    
     let gamesData = this.props.gamesList.filter(searchFor(term)).map(game => {
       return (
         <Game
@@ -243,280 +259,25 @@ class SearchBar extends Component {
   }
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+class Getgame extends Component{
+  constructor() {
+    super();
+
+    this.state = {
+      userAddress: null,
+    }
+  }
+  render() {
+    let userAddress = this.props.userAddress
+    console.log("IN component",userAddress)
+    return (
+      <div>
+      <button onClick={() => this.props.onGetgameClicked(userAddress)}>Get Game</button> 
+      </div>
+
+    )
+  }
+}
 
 class Login extends Component {
   constructor() {
