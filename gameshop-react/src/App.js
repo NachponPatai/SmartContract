@@ -11,7 +11,7 @@ class App extends Component {
   constructor() {
     super();
     this.state = {
-      userID: null,
+      userAddress: null,
       owner: '',
       gamelib: [
         { id: 1, name: 'Assss', price: 1000 },
@@ -49,7 +49,7 @@ class App extends Component {
   login(address, password) {
     login(address, password).then(res => {
       var state = this.state;
-      state.userID = address;
+      state.userAddress = address;
       this.setState(state);
     })
   }
@@ -72,12 +72,12 @@ class App extends Component {
         <Login onLoginClicked={(address, password) => {
           this.login(address, password)
           console.log(this.state.gamelib)
-          // console.log(this.state.userID)
+          console.log(this.state.userAddress)
           }
         } />
 
         <div>
-          <h2>Welcome {this.state.userID} to Game-shop</h2>
+          <h2>Welcome {this.state.userAddress} to Game-shop</h2>
           <p>This Contract is owner by {this.state.owner}</p>
           {/* <p>Get Game library {this.state.gamelib}</p> */}
           <hr />
@@ -104,7 +104,7 @@ class App extends Component {
             contractInstance={this.props.contractInstance}
             gamesList={games}
             searchTerm={this.state.term}
-            userAddress={this.state.userID}
+            userAddress={this.state.userAddress}
           />
         </div>
 
@@ -124,17 +124,21 @@ class Game extends Component {
 
   buygame(address, selectedGame) {
     buyGame(address, selectedGame).then(res => {
+      var gameID = this.props.id;
+      console.log('+++++', address)
+      // console.log(typeof(gameID));
       var state = this.state;
-      console.log(this.props.gamesList)
-      state.selectedGame = this.props.gamesList[this.props.id];
-      console.log(res)
-      console.log('buyGanme', state.gamelib)
+      state.selectedGame = this.props.gamesList[gameID];
+      // console.log(res)
+      // console.log('buyGanme', this.state.selectedGame)
     })
   }
 
   render() {
     let gameID = this.props.id;
-    console.log(gameID)
+    let userAddress = this.props.userAddress;
+    // console.log(gameID)
+    console.log(userAddress)
     return (
       <div className='Game'>
         <Card>
@@ -144,8 +148,9 @@ class Game extends Component {
             <CardSubtitle>{this.props.price}</CardSubtitle>
             <CardText>Some quick example text to build.</CardText>
             <BuyGame
-              gameID={gameID}
               contractInstance={this.props.contractInstance}
+              gameID={gameID}
+              userAddress={userAddress}
               onBuyClicked={(address, selectedGameIndex) => {
                               this.buygame(address, selectedGameIndex)
                             }
@@ -164,9 +169,13 @@ class GamesLibrary extends Component {
 
   render() {
     console.log(this.props.contractInstance);
+    console.log(this.props.gamesList);
+    console.log(this.props.userAddress);
+    
     let term = this.props.searchTerm;
     let temp;
-    console.log(this.props.gamesList)
+    let userAddress = this.props.userAddress;
+
     function searchFor(term) {
       return function (temp) {
         try {
@@ -186,7 +195,7 @@ class GamesLibrary extends Component {
           id={game.id}
           name={game.name}
           price={game.price}
-          userAddress={this.props.userAddress}
+          userAddress={userAddress}
         />
       )
     });
@@ -533,6 +542,7 @@ class BuyGame extends Component {
     super();
 
     this.state = {
+
     }
   }
 

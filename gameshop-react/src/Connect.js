@@ -17,8 +17,11 @@ export const signup = (password) => {
 
 export const buyGame = (address, selectedGame) => {
     return new Promise((resolve) => {
+        console.log(address);
+        console.log(selectedGame);
         console.log(contract.methods.buyGame(selectedGame));
-        // console.log(contract.methods.buyGame(selectedGame).send({value: 0.1, from: address}));
+        contract.methods.buyGame(selectedGame).send({value: 100000000, from: address});
+        // console.log();
         resolve(selectedGame)
     });
 }  
