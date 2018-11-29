@@ -51,7 +51,7 @@ describe('Inbox', () =>{
     it('test buyGame 4', async () => {
         const buyer = await inbox.methods.buyGame(4).send({
             from: accounts[0],
-            value: web3.utils.toWei('4','ether'),
+            value: web3.utils.toWei('3','ether'),
             gas: '300000'
         });
     });
@@ -59,7 +59,7 @@ describe('Inbox', () =>{
     it('test buyGame 7', async () => {
         const buyer = await inbox.methods.buyGame(7).send({
             from: accounts[0],
-            value: web3.utils.toWei('0.4','ether'),
+            value: web3.utils.toWei('1','ether'),
             gas: '300000'
         });
     });
@@ -69,7 +69,7 @@ describe('Inbox', () =>{
         try{
             const buyer = await inbox.methods.buyGame(0).send({
                 from: accounts[0],
-                value: web3.utils.toWei('4','ether'),
+                value: web3.utils.toWei('0.1','ether'),
                 gas: '300000'
             });
             console.log(buyer);

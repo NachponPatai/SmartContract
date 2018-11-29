@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GameShop</title>
+    <style>
+        body {
+            background-color:#F0F0F0;
+            padding: 2em;
+            font-family: 'Raleway','Source Sans Pro', 'Arial';
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+        }
+        label {
+            display:block;
+            margin-bottom:10px;
+        }
+        input {
+            padding:10px;
+            width: 50%;
+            margin-bottom: 1em;
+        }
+        button {
+            margin: 2em 0;
+            padding: 1em 4em;
+            display:block;
+        }
+        #balance {
+            padding:1em;
+            background-color:#fff;
+            margin: 1em 0;
+        }
+        #status {
+            font-weight:normal;
+            font-family: monospace;
+            padding:1em;
+            background-color:#fff;
+            margin: 1em 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Form -->
+    <div class="container">
+        <h1>GameShop</h1>
+        <h2 id="balance">Game Library = <span id="gamelibrary"></span></h2>
+        <button id="button" style="display: block" onclick="javascript:getGame()">Get Game Library</button>
+        <hr />
+        <br />
+        <label for="buyGame" class="col-lg-2 control-label"><strong>buyGame</strong></label>
+        <input id="buyGame" type="number" value="0" style="display: inline-block">
+        <button id="button" style="display: inline-block" onclick="javascript:buyGame()">buyGame</button>
+        <br />
+        <label><strong>Status</strong></label>
+        <h4 id="status"></h4>
+    </div>
+</body>
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/ethereum/web3.js/dist/web3.min.js"></script>
+<script src="Lottoreum.json"></script>
+<script>
+    function addStatusLine(text) {
+        document.getElementById("status").innerHTML = text + "<br/><br/>" + document.getElementById("status").innerHTML;
+    }
+    function getGame() {
+        addStatusLine("");
+        addStatusLine("calling getGame()");
+        // TODO: Call getBalance Smart Contract
+        SimpleContract.getGame(function (errorGet, resultGet) {
+            addStatusLine("Game Library =" + resultGet);
+            document.getElementById('gamelibrary').innerText = resultGet;
+        })
+    }
+    function buyGame() {
+        // TODO: Call setBalance Smart Contract
+        //addStatusLine("called");
+        buyGame = parseInt(document.getElementById('buyGame').value);
+        //addStatusLine(newBalance);
+        SimpleContract.buyGame(buyGame,{
+            value: "1000000000000000000",
+            from: add
+        }, function (error, result) {
+            if (error) {
+                addStatusLine(error);
+                return;
+            }
+            // addStatusLine("");
+            addStatusLine("calling buyGame(" + buyGame + ")");
+            txHash = result;
+            addStatusLine("TxHash = <a href='https://rinkeby.etherscan.io/tx/" +
+                result + "' target='_blank'>" + result + "</a>");
+        });
+    }
+    // Initializing
+    if (typeof web3 !== 'undefined') {
+        web3 = new Web3(web3.currentProvider); // inject from Metamask plugin
+    }
+    // Get default address
+    web3.eth.defaultAccount = web3.eth.accounts[0];
+    var add = web3.eth.defaultAccount;
+    // TODO: Replace your SimpleContract contract address here
+    var contractAddress = '0x4434d97ec84c865a524bce3ecf4170dd9ca0168d';
+    // TODO: Replace your SimpleContract abi here
+    var abi = [
+        {
+            "constant": false,
+            "inputs": [
+                {
+                    "name": "index",
+                    "type": "uint256"
+                }
+            ],
+            "name": "buyGame",
+            "outputs": [],
+            "payable": true,
+            "stateMutability": "payable",
+            "type": "function"
+        },
+        {
+            "inputs": [],
+            "payable": false,
+            "stateMutability": "nonpayable",
+            "type": "constructor"
+        },
+        {
+            "constant": true,
+            "inputs": [
+                {
+                    "name": "",
+                    "type": "uint256"
+                }
+            ],
+            "name": "games",
+            "outputs": [
+                {
+                    "name": "name",
+                    "type": "string"
+                },
+                {
+                    "name": "price",
+                    "type": "uint256"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "getGame",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "string[]"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        },
+        {
+            "constant": true,
+            "inputs": [],
+            "name": "owner",
+            "outputs": [
+                {
+                    "name": "",
+                    "type": "address"
+                }
+            ],
+            "payable": false,
+            "stateMutability": "view",
+            "type": "function"
+        }
+    ];
+    // Create an interface to SimpleContract on TomoChain
+    var SimpleContractContract = web3.eth.contract(abi);
+    var SimpleContract = SimpleContractContract.at(contractAddress);
+    // Get Balance on the first load
+    getGame();
+</script>
+
+</html>
