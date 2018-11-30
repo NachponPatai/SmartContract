@@ -1,35 +1,34 @@
 import React, { Component } from 'react';
 import './App.css';
-import web3 from './web3';
 import gameshop from './gameshop';
-import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle, Button } from 'reactstrap';
+import { Card, CardImg, CardText, CardBody, CardTitle, CardSubtitle } from 'reactstrap';
 import logo from './logo.svg';
-import { login, getGame, buyGame, GiveGame } from './Connect';
-import { stat } from 'fs';
-
+import { login, getGame, buyGame } from './Connect';
+import { Container, Row, Col } from 'reactstrap';
 
 class App extends Component {
   constructor() {
     super();
     this.state = {
-      userAddress: '0x076fF45138f97A9989a44A84472f59B6661d4dF2',
+      userAddress: '',
       owner: '',
       gamelib: [
-        { id: 1, name: 'Assss', price: 554500000000000000 },
-        { id: 2, name: 'Bssss', price: 554500000000000000 },
-        { id: 3, name: 'Cssss', price: 554500000000000000 },
-        { id: 4, name: 'Dssss', price: 554500000000000000 },
-        { id: 5, name: 'Essss', price: 554500000000000000 },
-        { id: 6, name: 'kuy', price: 554500000000000000 },
-        { id: 7, name: 'bar', price: 554500000000000000 },
-        { id: 8, name: 'foo', price: 554500000000000000 },
-        { id: 9, name: 'Avalanche', price: 554500000000000000 },
+        { id: 1, name: 'Artifact', price: 20000000000000000, image: '' },
+        { id: 2, name: 'Dota2', price: 10000000000000000, image: '' },
+        { id: 3, name: 'LoL', price: 10000000000000000, image: '' },
+        { id: 4, name: 'HoN', price: 10000000000000000, image: '' },
+        { id: 5, name: 'Remix', price: 30000000000000000, image: '' },
+        { id: 6, name: 'Creed', price: 30000000000000000, image: '' },
+        { id: 7, name: 'RoV', price: 20000000000000000, image: '' },
+        { id: 8, name: 'CSGO', price: 10000000000000000, image: '' },
+        { id: 9, name: 'Overwatch', price: 20000000000000000, image: '' },
+        { id: 10, name: 'Everplanet', price: 10000000000000000, image: '' },
       ],
       value: '',
       term: '',
-      isLoggedIn: false
+      isLoggedIn: false,
+      userPlayable: []
     };
-
     this.handleSearch = this.handleSearch.bind(this);
   }
 
@@ -39,14 +38,13 @@ class App extends Component {
     });
   }
 
-  getgame(address, contractInstance) {
-    getGame(address, contractInstance).then(res => {
-      console.log("RES : ",res);
+  getgame(address) {
+    getGame(address).then(res => {
+      console.log("res:", res);
       var state = this.state;
-      state.gamelib = res.gamelib;
-      
+      state.userPlayable = res;
       this.setState(state);
-      console.log(state.gamelib);
+      console.log(this.state.userPlayable);
     });
   }
 
@@ -54,86 +52,152 @@ class App extends Component {
     login(address, password).then(res => {
       var state = this.state;
       state.userAddress = address;
-      // if(address === '') {
-      //   state.isLoggedIn = true;
-      //   this.setState(state);
-      // }
-      // else {
-      //   state.isLoggedIn = false;
-      //   this.setState(state);
-      // }
       this.setState(state);
     })
   }
 
-  async componentDidMount() {
+  async componentWillMount() {
     const owner = await gameshop.methods.owner().call();
-    const gamelib = await gameshop.methods.getGame().call();
-    console.log('+++', owner);
+    const userGamesLib = await gameshop.methods.getGame().call();
+    // console.log('userGameLib', userGamesLib);
     this.setState(
       {
         owner,
+        userPlayable: userGamesLib,
       });
   }
 
   render() {
     let games = this.state.gamelib;
     let userAddress = this.state.userAddress;
-    console.log("in main app" ,userAddress);
-    // console.log('loggedIn', this.state.isLoggedIn);
+    console.log("in main app", userAddress);
     return (
       <div className="App">
-        <Login onLoginClicked={(address, password) => {
-          this.login(address, password)
-          // console.log(this.state.gamelib)
-          // console.log(this.state.userAddress)
-          }
-        } />
+        <Container>
+          <Row>
+            <Col xs="3"></Col>
+            <Col xs="auto">
+              <Login onLoginClicked={(address, password) => {
+                this.login(address, password)
+              }} />
+              <hr />
 
-        <div>
-          <h2>Welcome {this.state.userAddress} to Game-shop</h2>
-          <p>This Contract is owner by {this.state.owner}</p>
-          {/* <p>Get Game library {this.state.gamelib}</p> */}
-          <hr />
-          {/* <form>
-            <h4>
-              Buy Game
-          </h4>
-            <div>
-              <label>Price</label>
-              <input
-                value={this.state.value}
-                onChange={event => this.setState({ value: event.target.value })}
+              <div>
+                <h2>Welcome {this.state.userAddress} to Game-shop</h2>
+                <p>This Contract is owned by {this.state.owner}</p>
+              </div>
+              <hr />
+
+              <div>
+                <h1>User's Games Library</h1>
+                <GetGame
+                  userAddress={userAddress}
+                  onGetGameClicked={(address) => {
+                    console.log("see address", address);
+                    this.getgame(address)
+                  }} />
+              </div>
+            </Col>
+            <Col xs="3"></Col>
+          </Row>
+          <Row>
+            <Col xs="6">
+              <UserGamesLibrary
+                userAddress={this.state.userAddress}
+                userPlayableList={this.state.userPlayable}
+                gamesList={games}
               />
-            </div>
-            <button>Buy</button>
-          </form> */}
-        </div>
-        <div>
-        <h1>User Game</h1>
-        <Getgame
-          userAddress={userAddress}
-          
-          onGetgameClicked={(address) =>{
-            console.log("see add",address)
-            this.getgame(address, "password")
-          }
-          
-        }/>
-        </div>
-        <div>
-          <h1>Games Library</h1>
-          <SearchBar handleSearch={this.handleSearch} />
-          <hr />
-          <GamesLibrary
-            contractInstance={this.props.contractInstance}
-            gamesList={games}
-            isLoggedIn={this.state.isLoggedIn}
-            searchTerm={this.state.term}
-            userAddress={this.state.userAddress}
-          />
-        </div>
+              <hr />
+            </Col>
+            <Col xs="6">
+              <div>
+                <h1>Games Library</h1>
+                <SearchBar handleSearch={this.handleSearch} />
+                <GamesLibrary
+                  gamesList={games}
+                  isLoggedIn={this.state.isLoggedIn}
+                  searchTerm={this.state.term}
+                  userAddress={this.state.userAddress}
+                />
+              </div></Col>
+          </Row>
+        </Container>
+      </div>
+    )
+  }
+}
 
+class UserGamesLibrary extends Component {
+  render() {
+    let userPlayable = this.props.userPlayableList;
+    let gamesList = this.props.gamesList;
+    let userAddress = this.props.userAddress;
+
+    let userPlayableList = userPlayable.map((game, index) => {
+      if (game) {
+        return gamesList[index];
+      }
+    }).filter(Boolean);
+
+    console.log('userPlayableGames', userPlayableList);
+
+    let userGamesData = userPlayableList.map((game) => {
+      if (userPlayableList !== undefined) {
+        return (
+          <UserGame
+            gamesList={userPlayableList}
+            id={game.id}
+            name={game.name}
+            price={game.price}
+            userAddress={userAddress}
+          />
+        )
+      }
+      else {
+        return <Undefined />
+      }
+    });
+
+    return (
+      <div className="GamesLibrary" >
+        {userGamesData}
+      </div>
+    )
+  }
+}
+
+class Undefined extends Component {
+  render() {
+    return (<div></div>)
+  }
+}
+
+class UserGame extends Component {
+  constructor() {
+    super();
+    this.state = {
+      gamelib: [],
+      selectedGame: {},
+    }
+  }
+
+  render() {
+    let gameID = this.props.id;
+    let gamePrice = this.props.price;
+    let userAddress = this.props.userAddress;
+
+    // console.log(gameID);
+    console.log(userAddress);
+    return (
+      <div className='Game'>
+        <Card>
+          <CardImg top width="320px" height="384px" src={logo} />
+          <CardBody>
+            <CardTitle>Owned: {this.props.name}</CardTitle>
+            <CardSubtitle>Play now</CardSubtitle>
+            <CardText>Description</CardText>
+          </CardBody>
+        </Card>
       </div>
     )
   }
@@ -163,6 +227,7 @@ class Game extends Component {
     let gameID = this.props.id;
     let gamePrice = this.props.price;
     let userAddress = this.props.userAddress;
+
     // console.log(gameID);
     console.log(userAddress);
     return (
@@ -170,9 +235,9 @@ class Game extends Component {
         <Card>
           <CardImg top width="100%" height="384px" src={logo} />
           <CardBody>
-            <CardTitle>{this.props.id} {this.props.name}</CardTitle>
-            <CardSubtitle>{this.props.price}</CardSubtitle>
-            <CardText>Some quick example text to build.</CardText>
+            <CardTitle>{this.props.id}: {this.props.name}</CardTitle>
+            <CardSubtitle>Price: {this.props.price}</CardSubtitle>
+            <CardText>Description</CardText>
             <BuyGame
               contractInstance={this.props.contractInstance}
               gameID={gameID}
@@ -180,9 +245,8 @@ class Game extends Component {
               isLoggedIn={this.props.isLoggedIn}
               userAddress={userAddress}
               onBuyClicked={(address, selectedGameIndex, price) => {
-                              this.buygame(address, selectedGameIndex, price)
-                            }
-              } />
+                this.buygame(address, selectedGameIndex, price)
+              }} />
           </CardBody>
         </Card>
       </div>
@@ -191,15 +255,11 @@ class Game extends Component {
 }
 
 class GamesLibrary extends Component {
-  constructor() {
-    super();
-  }
-
   render() {
-    console.log(this.props.contractInstance);
-    console.log(this.props.gamesList);
-    console.log(this.props.userAddress);
-    
+    // console.log(this.props.contractInstance);
+    console.log('gameLib', this.props.gamesList);
+    // console.log(this.props.userAddress);
+
     let term = this.props.searchTerm;
     let temp;
     let userAddress = this.props.userAddress;
@@ -210,11 +270,11 @@ class GamesLibrary extends Component {
           return temp.name.toLowerCase().includes(term.toLowerCase()) || !term;
         }
         catch (err) {
-          return 'Nothing found...'
+          console.log(err);
         }
       }
     }
-    
+
     let gamesData = this.props.gamesList.filter(searchFor(term)).map(game => {
       return (
         <Game
@@ -224,6 +284,7 @@ class GamesLibrary extends Component {
           name={game.name}
           price={game.price}
           userAddress={userAddress}
+          image={this.props.image}
         />
       )
     });
@@ -259,22 +320,20 @@ class SearchBar extends Component {
   }
 }
 
-class Getgame extends Component{
+class GetGame extends Component {
   constructor() {
     super();
 
     this.state = {
-      userAddress: null,
     }
   }
   render() {
-    let userAddress = this.props.userAddress
-    console.log("IN component",userAddress)
+    let userAddress = this.props.userAddress;
+    console.log("In component", userAddress)
     return (
       <div>
-      <button onClick={() => this.props.onGetgameClicked(userAddress)}>Get Game</button> 
+        <button onClick={() => this.props.onGetGameClicked(userAddress)}>Get Game</button>
       </div>
-
     )
   }
 }
@@ -296,14 +355,8 @@ class Login extends Component {
           userAddress: e.target.value,
         })
         } />
-        <input className="Password" type="text" placeholder="Password..." onChange={e => this.setState({
-          password: e.target.value,
-        })
-        } />
-        {/* <h1>account: {this.state.userAddress}</h1> */}
-        {/* <h1>password: {this.state.password}</h1> */}
         <button onClick={() => this.props.onLoginClicked(this.state.userAddress, this.state.password)}>
-        Login
+          Login
         </button>
       </div>
     )
@@ -322,13 +375,11 @@ class BuyGame extends Component {
   render() {
     let selectedGameIndex = this.props.gameID;
     let selectedGamePrice = this.props.gamePrice;
-    console.log('BuyGame', selectedGameIndex - 1);
-    console.log('gamePrice', selectedGamePrice);
     let userAddress = this.props.userAddress;
     return (
       <div className="BuyGame">
         <button onClick={() => this.props.onBuyClicked(userAddress, selectedGameIndex - 1, selectedGamePrice)}>
-        Buy
+          Buy
         </button>
       </div>
     )

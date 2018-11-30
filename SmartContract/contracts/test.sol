@@ -17,25 +17,25 @@ contract Inbox{
     constructor() public {
         owner = msg.sender;
         games[0].name = "Artifact";
-        games[0].price = 0.02 ether;
+        games[0].price = 2 ether;
         games[1].name = "Dota2";
-        games[1].price = 0.01 ether;
+        games[1].price = 1 ether;
         games[2].name = "LoL";
-        games[2].price = 0.01 ether;
+        games[2].price = 1 ether;
         games[3].name = "HoN";
-        games[3].price = 0.01 ether;
+        games[3].price = 1 ether;
         games[4].name = "Remix";
-        games[4].price = 0.03 ether;
+        games[4].price = 3 ether;
         games[5].name = "Creed";
-        games[5].price = 0.03 ether;
+        games[5].price = 3 ether;
         games[6].name = "RoV";
-        games[6].price = 0.02 ether;
+        games[6].price = 2 ether;
         games[7].name = "CSGO";
-        games[7].price = 0.01 ether;
+        games[7].price = 1 ether;
         games[8].name = "Overwatch";
-        games[8].price = 0.02 ether;
+        games[8].price = 2 ether;
         games[9].name = "EverPlanet";
-        games[9].price = 0.01 ether;
+        games[9].price = 1 ether;
     }
    
        
@@ -56,11 +56,11 @@ contract Inbox{
         }
     }
    
-    function getGame() public view returns (bool[]) {
-        bool[] memory lib = new bool[](10);
+    function getGame() public view returns (string[]) {
+        string[] memory lib = new string[](10);
         for (uint i = 0; i < gamelib[msg.sender].length; i++) {
             if (gamelib[msg.sender][i]) {
-                lib[i] = true;
+                lib[i] = games[i].name;
             }
         }
        
