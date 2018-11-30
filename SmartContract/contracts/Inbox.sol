@@ -56,11 +56,11 @@ contract Inbox{
         }
     }
    
-    function getGame() public view returns (string[]) {
-        string[] memory lib = new string[](10);
+    function getGame() public view returns (bool[]) {
+        bool[] memory lib = new bool[](10);
         for (uint i = 0; i < gamelib[msg.sender].length; i++) {
             if (gamelib[msg.sender][i]) {
-                lib[i] = games[i].name;
+                lib[i] = true;
             }
         }
        
